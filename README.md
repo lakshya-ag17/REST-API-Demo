@@ -3,8 +3,6 @@
 This is a simple frontend project that demonstrates how to fetch and display user data from a public REST API using **JavaScript Fetch API**.
 
 ---
-
-## 🌐 Live Demo
 👉 [Click here to view it live](https://lakshya-ag17.github.io/REST-API-Demo/)  
 ---
 
