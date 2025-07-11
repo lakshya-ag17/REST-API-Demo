@@ -1,0 +1,159 @@
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST API Demo</title>
+
+    <!-- Bootstrap Links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
+
+
+    <!-- CSS -->
+    <style>
+      body{
+        background-color: #e9ecef;
+        padding: 30px;
+      }    
+
+      .card{
+        background-color: #2a2a2a;
+        color: #ffffff;
+      }
+
+      .current-page{
+        display: inline-block;
+        margin-left: 20px;
+      }
+    </style>
+
+  </head>
+
+
+  <body>
+    <h1>User Directory</h1>
+
+
+    <div class="loading_header">
+      <!-- Spinner added here while loading -->
+    </div>
+
+
+    <h3 class="error_header">
+      <!-- Error text displayed here -->
+    </h3>
+
+
+    <!-- Container for User Cards -->
+    <div class="container mt-4 px-3 user-container">
+      <div class="row">
+        <!-- User cards added here -->
+      </div>
+    </div>
+    
+
+    <!-- Next/Prev Buttons -->
+    <button class="btn btn-info prev_btn" onclick="loadPrevPage()">
+      Previous Page
+    </button>
+  
+    <button class="btn btn-info next_btn" onclick="loadNextPage()">
+      Next Page
+    </button>
+
+    <p class="current-page">Page: 1</p>
+
+    <!-- Javascript -->
+    <script>
+      let currentPage = 0;
+      const errorHeader = document.querySelector(".error_header");
+      const loadingHeader = document.querySelector(".loading_header");
+      const userContainer = document.querySelector(".user-container");
+      const currentPageNumber = document.querySelector(".current-page");
+      const prevBtn = document.querySelector(".prev_btn");
+
+
+    function loadUsers(pageNumber){
+
+      if (pageNumber === 1) {
+        prevBtn.style.display = "none"; // Hide on Page 1
+      } else {
+        prevBtn.style.display = "inline-block"; // Show on other pages
+      }
+
+
+      loadingHeader.innerHTML = `<div class="spinner-border" role="status"> </div>`;
+      
+      userContainer.querySelector(".row").innerHTML = '';
+        let fetchURL = `https://reqres.in/api/users?page=${pageNumber}`;
+
+
+        fetch(fetchURL, {
+        headers:{"x-api-key":"reqres-free-v1"}
+      })
+        .then(response => {
+          loadingHeader.innerHTML = '';
+
+          if (!response.ok){
+            throw new Error("Error "+ response.status);
+            errorHeader.innerHTML = `
+          Error fetching data.${error}`;;
+          }
+          console.log("Response received");
+          //console.log(response);
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+
+          userContainer.querySelector(".row").innerHTML = '';
+          data.data.forEach(user=>{
+            const userCard = `
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 mt-4">
+                <div class="card h-100">
+                  <img src="${user.avatar}" class="card-img-top img-fluid" alt="${user.first_name} ${user.last_name}">
+                  <div class="card-body">
+                    <h5 class="card-title">${user.first_name} ${user.last_name}</h5>
+                    <p class="card-text">Email: ${user.email}</p>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            userContainer.querySelector(".row").innerHTML += userCard;
+          })
+
+        })
+        .catch(error => {
+          loadingHeader.innerHTML = '';
+
+          console.error("Error fetching data:", error);
+          errorHeader.innerHTML = `
+          Error fetching data.${error}`;
+        });
+        
+      console.log("Loading data...");
+    }
+
+    
+      function loadNextPage(){
+        currentPage+=1;
+        loadUsers(currentPage);
+        currentPageNumber.innerHTML = `Page: ${currentPage}`;
+
+      }
+
+      function loadPrevPage(){
+        currentPage--;
+        loadUsers(currentPage);
+        currentPageNumber.innerHTML = `Page: ${currentPage}`;
+      }
+      
+    loadNextPage();
+
+
+    </script>
+  </body>
+  </html>
